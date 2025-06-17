@@ -1,37 +1,64 @@
 {
   "expo": {
-    "name": "OremiApp",
-    "slug": "OremiApp",
+    "name": "Oremi",
+    "slug": "Oremi",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logooremi.png",
     "scheme": "oremiapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Cette app a besoin du microphone pour l'assistant vocal.",
+        "NSSpeechRecognitionUsageDescription": "Cette app utilise la reconnaissance vocale pour vous comprendre."
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/logooremi.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ]
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/logooremi.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/logooremi.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Cette app a besoin du microphone pour l'assistant vocal."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Cette app a besoin du microphone pour l'assistant vocal."
+        }
+      ],
+      [
+        "@react-native-voice/voice",
+        {
+          "microphonePermission": "Cette app utilise la reconnaissance vocale pour vous comprendre.",
+          "speechRecognitionPermission": "Cette app a besoin d'accéder à la reconnaissance vocale."
         }
       ]
     ],
