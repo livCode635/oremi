@@ -16,6 +16,8 @@ import {
 
 import * as Speech from "expo-speech";
 import { Audio } from "expo-av";
+import SinistreFlow from "@/components/SinistreFlow";
+import SouscriptionAutoFlow from "@/components/SouscriptionAutoFlow";
 
 const { width, height } = Dimensions.get("window");
 
@@ -139,6 +141,9 @@ class RasaService {
 
 const OremiAI = () => {
   const [currentScreen, setCurrentScreen] = useState(0);
+  const [showSinistreFlow, setShowSinistreFlow] = useState(false);
+  const [showSouscriptionAutoFlow, setShowSouscriptionAutoFlow] =
+    useState(false);
 
   type Service = {
     id: string;
@@ -208,11 +213,24 @@ const OremiAI = () => {
   const [pulseAnim] = useState(new Animated.Value(1));
   const [floatAnim] = useState(new Animated.Value(0));
   const [shimmerAnim] = useState(new Animated.Value(0));
-  
+
   // ✅ FIX: Références pour gérer le focus et le scroll
   const scrollViewRef = useRef<ScrollView | null>(null);
   const textInputRef = useRef<TextInput | null>(null);
-
+  const handleServiceSelect = (service) => {
+    if (service.id === "sinistres") {
+      setShowSinistreFlow(true);
+      setSelectedService(service);
+    } else if (service.id === "souscription") {
+      setShowSouscriptionAutoFlow(true);
+      setSelectedService(service);
+    } else {
+      // Comportement normal pour les autres services
+      setSelectedService(service);
+      setCurrentScreen(2);
+    }
+    Vibration.vibrate(30);
+  };
   // Initialize animations
   useEffect(() => {
     Animated.loop(
@@ -366,7 +384,7 @@ const OremiAI = () => {
   // Synthèse vocale
   const speakText = (text) => {
     // Nettoyer le texte des emojis et caractères spéciaux
-    const cleanText = text.replace(/[🔥⚡🚗🏠🛡️💎🧠📋💰🎯⚖️📊🆘📞💬🔊]/g, "");
+    const cleanText = text.replace(/[🔥⚡🚗🏠🛡️💎🧠📋💰🎯⚖️📊🆘📞💬🔊**]/g, "");
 
     setIsSpeaking(true);
     Speech.speak(cleanText, {
@@ -627,11 +645,7 @@ const OremiAI = () => {
               <TouchableOpacity
                 key={index}
                 style={styles.serviceCard}
-                onPress={() => {
-                  setSelectedService(service);
-                  setCurrentScreen(2);
-                  Vibration.vibrate(30);
-                }}
+                onPress={() => handleServiceSelect(service)} // Utiliser la nouvelle fonction
                 activeOpacity={0.8}
               >
                 <View style={styles.serviceContent}>
@@ -1171,9 +1185,31 @@ const OremiAI = () => {
 
   return (
     <View style={styles.container}>
-      {currentScreen === 0 && <WelcomeScreen />}
-      {currentScreen === 1 && <VoiceScreen />}
-      {currentScreen === 2 && <ChatScreen />}
+      {showSinistreFlow ? (
+        <SinistreFlow
+          onBack={() => {
+            setShowSinistreFlow(false);
+            setSelectedService(null);
+            setCurrentScreen(0);
+            setMessages([]);
+          }}
+        />
+      ) : showSouscriptionAutoFlow ? (
+        <SouscriptionAutoFlow
+          onBack={() => {
+            setShowSouscriptionAutoFlow(false);
+            setSelectedService(null);
+            setCurrentScreen(0);
+            setMessages([]);
+          }}
+        />
+      ) : (
+        <>
+          {currentScreen === 0 && <WelcomeScreen />}
+          {currentScreen === 1 && <VoiceScreen />}
+          {currentScreen === 2 && <ChatScreen />}
+        </>
+      )}
     </View>
   );
 };
