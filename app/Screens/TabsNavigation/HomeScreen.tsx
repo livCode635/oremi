@@ -23,7 +23,7 @@ const { width, height } = Dimensions.get("window");
 class RasaService {
   constructor() {
     // CHANGEZ cette URL si votre serveur Rasa est sur une autre adresse
-    this.baseURL = "http://192.168.40.184:5005"; // Pour émulateur Android: http://10.0.2.2:5005
+    this.baseURL = "http://192.168.40.184:5005";
     this.sessionId = this.generateSessionId();
   }
 
@@ -1200,7 +1200,7 @@ const styles = StyleSheet.create({
   },
   heroSection: {
     paddingHorizontal: 24,
-    marginBottom: 15,
+    marginBottom: 30,
     marginTop: 60,
   },
   heroCard: {

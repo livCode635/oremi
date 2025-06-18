@@ -1,427 +1,258 @@
-// App.js - Oremi React Native App
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  FlatList,
   StatusBar,
+  TouchableOpacity,
+  ScrollView,
   SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
-  Animated,
-  Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { goBack } from 'expo-router/build/global-state/routing';
 
-const OremiApp = () => {
-  const [showAssistant, setShowAssistant] = useState(false);
-  const [messages, setMessages] = useState([
+const OremiAssurancesScreen = () => {
+  const [activeTab, setActiveTab] = useState('actifs');
+
+  const contratsActifs = [
     {
       id: 1,
-      text: "Bonjour ! Je suis votre assistant Oremi. Comment puis-je vous aider aujourd'hui ?",
-      sender: 'bot',
-      time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-    }
-  ]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [notifications] = useState(3);
-  const flatListRef = useRef(null);
-  const typingAnimation = useRef(new Animated.Value(0)).current;
-
-  // Animation pour l'indicateur de frappe
-  useEffect(() => {
-    if (isTyping) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(typingAnimation, {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-          Animated.timing(typingAnimation, {
-            toValue: 0,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    }
-  }, [isTyping]);
-
-  const handleSendMessage = () => {
-    if (inputMessage.trim()) {
-      const newMessage = {
-        id: Date.now(),
-        text: inputMessage,
-        sender: 'user',
-        time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-      };
-      
-      setMessages(prev => [...prev, newMessage]);
-      setInputMessage('');
-      setIsTyping(true);
-
-      // Simulation de réponse du bot
-      setTimeout(() => {
-        const botResponse = getBotResponse(inputMessage);
-        setMessages(prev => [...prev, {
-          id: Date.now() + 1,
-          text: botResponse,
-          sender: 'bot',
-          time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-        }]);
-        setIsTyping(false);
-      }, 1500);
-    }
-  };
-
-  const getBotResponse = (userMessage) => {
-    const message = userMessage.toLowerCase();
-    
-    if (message.includes('assurance auto') || message.includes('voiture')) {
-      return "Pour une assurance automobile, je peux vous aider à obtenir un devis en quelques minutes. Souhaitez-vous commencer la souscription ou avez-vous des questions spécifiques ?";
-    } else if (message.includes('moto')) {
-      return "Excellent choix ! Notre assurance moto couvre les 2 et 3 roues. Quel type de moto souhaitez-vous assurer ?";
-    } else if (message.includes('habitation') || message.includes('maison')) {
-      return "L'assurance habitation Oremi vous protège contre les risques d'incendie, vol, dégâts des eaux. Voulez-vous une estimation ?";
-    } else if (message.includes('voyage')) {
-      return "Notre assurance voyage vous couvre à l'international. Quelle est votre destination et la durée de votre séjour ?";
-    } else if (message.includes('prix') || message.includes('coût') || message.includes('tarif')) {
-      return "Les tarifs varient selon vos besoins. Je peux vous faire une estimation personnalisée. Quel type d'assurance vous intéresse ?";
-    } else if (message.includes('sinistre') || message.includes('accident')) {
-      return "En cas de sinistre, vous pouvez déclarer directement via l'app. Avez-vous un sinistre à déclarer maintenant ?";
-    } else if (message.includes('affiliation') || message.includes('parrainage')) {
-      return "Notre programme d'affiliation vous permet de gagner des commissions en parrainant de nouveaux clients. Voulez-vous en savoir plus ?";
-    } else if (message.includes('scanner') || message.includes('document')) {
-      return "Le scanner de documents vous permet de numériser vos papiers d'identité, permis de conduire, etc. directement avec votre téléphone. Très pratique pour vos souscriptions !";
-    } else {
-      return "Je suis là pour vous aider avec vos assurances. Vous pouvez me poser des questions sur nos produits : Auto, Moto, Habitation, Voyage, ou sur notre programme d'affiliation. Que souhaitez-vous savoir ?";
-    }
-  };
-
-  const quickQuestions = [
-    "Assurance auto pas chère",
-    "Comment déclarer un sinistre ?",
-    "Devis assurance moto",
-    "Programme d'affiliation",
-    "Scanner de documents",
-    "Assurance voyage international"
-  ];
-
-  const insuranceProducts = [
-    {
-      id: 1,
-      name: 'Voiture',
-      icon: '🚗',
-      colors: ['#A7F3D0', '#34D399'],
-      description: 'Protection complète pour votre véhicule'
+      type: 'Auto',
+      nom: 'Assurance Véhicule',
+      vehicule: 'Peugeot 308 - AB-123-CD',
+      numeroContrat: 'AUTO789456',
+      dateDebut: '15/01/2024',
+      dateFin: '14/01/2025',
+      prochainePrime: '65 FCFA',
+      dateProchainePrime: '15/01/2025',
+      statut: 'Actif',
+      garanties: ['Responsabilité civile', 'Tous risques', 'Protection juridique', 'Assistance 0km'],
+      franchise: '200 FCFA',
+      icon: 'car-sport',
+      color: '#10b981',
+      backgroundColor: '#ecfdf5',
     },
     {
       id: 2,
-      name: 'Moto',
-      icon: '🏍️',
-      colors: ['#FDE68A', '#F59E0B'],
-      description: 'Assurance 2 et 3 roues'
+      type: 'Habitation',
+      nom: 'Multirisque Habitation',
+      adresse: '25 Rue des Fleurs, 75015 Paris',
+      numeroContrat: 'HAB456123',
+      dateDebut: '01/09/2023',
+      dateFin: '31/08/2024',
+      prochainePrime: '42 FCFA',
+      dateProchainePrime: '01/09/2024',
+      statut: 'Actif',
+      garanties: ['Incendie', 'Dégâts des eaux', 'Vol', 'Responsabilité civile'],
+      franchise: '150 FCFA',
+      icon: 'home',
+      color: '#3b82f6',
+      backgroundColor: '#eff6ff',
     },
-    {
-      id: 3,
-      name: 'Voyage',
-      icon: '🧳',
-      colors: ['#FBBF24', '#F59E0B'],
-      description: 'Voyagez en toute sérénité'
-    },
-    {
-      id: 4,
-      name: 'Habitation',
-      icon: '🏠',
-      colors: ['#93C5FD', '#3B82F6'],
-      description: 'Protégez votre foyer'
-    }
   ];
 
-  const handleQuickQuestion = (question) => {
-    setInputMessage(question);
-    setTimeout(() => handleSendMessage(), 100);
-  };
+  const contratsExpires = [
+    {
+      id: 4,
+      type: 'Auto',
+      nom: 'Ex-Assurance Citroën',
+      vehicule: 'Citroën C3 - XY-789-ZA',
+      numeroContrat: 'AUTO123789',
+      dateDebut: '10/03/2022',
+      dateFin: '09/03/2023',
+      statut: 'Expiré',
+      motifArret: 'Vente du véhicule',
+      icon: 'car-sport',
+      color: '#6b7280',
+      backgroundColor: '#f9fafb',
+    },
+  ];
 
-  const renderMessage = ({ item }) => (
-    <View style={[
-      styles.messageContainer,
-      item.sender === 'user' ? styles.userMessage : styles.botMessage
-    ]}>
-      <View style={[
-        styles.messageBubble,
-        item.sender === 'user' ? styles.userBubble : styles.botBubble
-      ]}>
-        <Text style={[
-          styles.messageText,
-          item.sender === 'user' ? styles.userText : styles.botText
+  const renderContratCard = (contrat, isExpired = false) => (
+    <TouchableOpacity key={contrat.id} style={[styles.contratCard, isExpired && styles.expiredCard]}>
+      <View style={styles.contratHeader}>
+        <View style={[styles.contratIcon, { backgroundColor: contrat.backgroundColor }]}>
+          <Ionicons name={contrat.icon} size={24} color={contrat.color} />
+        </View>
+        <View style={styles.contratHeaderInfo}>
+          <Text style={[styles.contratType, isExpired && styles.expiredText]}>{contrat.type}</Text>
+          <Text style={[styles.contratNom, isExpired && styles.expiredText]}>{contrat.nom}</Text>
+        </View>
+        <View style={[styles.statutBadge, 
+          contrat.statut === 'Actif' ? styles.actifBadge : styles.expireBadge
         ]}>
-          {item.text}
-        </Text>
-        <Text style={[
-          styles.messageTime,
-          item.sender === 'user' ? styles.userTime : styles.botTime
-        ]}>
-          {item.time}
-        </Text>
-      </View>
-    </View>
-  );
-
-  const TypingIndicator = () => (
-    <View style={[styles.messageContainer, styles.botMessage]}>
-      <View style={[styles.messageBubble, styles.botBubble]}>
-        <View style={styles.typingContainer}>
-          <Animated.View style={[
-            styles.typingDot,
-            {
-              opacity: typingAnimation.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0.3, 1],
-              }),
-            }
-          ]} />
-          <Animated.View style={[
-            styles.typingDot,
-            {
-              opacity: typingAnimation.interpolate({
-                inputRange: [0, 0.5, 1],
-                outputRange: [0.3, 1, 0.3],
-              }),
-            }
-          ]} />
-          <Animated.View style={[
-            styles.typingDot,
-            {
-              opacity: typingAnimation.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1, 0.3],
-              }),
-            }
-          ]} />
+          <Text style={[styles.statutText,
+            contrat.statut === 'Actif' ? styles.actifText : styles.expireText
+          ]}>
+            {contrat.statut}
+          </Text>
         </View>
       </View>
-    </View>
+
+      <View style={styles.contratDetails}>
+        <Text style={[styles.contratNumero, isExpired && styles.expiredText]}>
+          Contrat {contrat.numeroContrat}
+        </Text>
+        
+        {contrat.vehicule && (
+          <Text style={[styles.contratInfo, isExpired && styles.expiredText]}>
+            🚗 {contrat.vehicule}
+          </Text>
+        )}
+        
+        {contrat.adresse && (
+          <Text style={[styles.contratInfo, isExpired && styles.expiredText]}>
+            🏠 {contrat.adresse}
+          </Text>
+        )}
+        
+        {contrat.formule && (
+          <Text style={[styles.contratInfo, isExpired && styles.expiredText]}>
+            💊 {contrat.formule}
+          </Text>
+        )}
+
+        <View style={styles.datesContainer}>
+          <Text style={[styles.dateText, isExpired && styles.expiredText]}>
+            📅 Du {contrat.dateDebut} au {contrat.dateFin}
+          </Text>
+        </View>
+
+        {!isExpired && (
+          <>
+            <View style={styles.primeContainer}>
+              <Text style={styles.primeLabel}>Prochaine prime :</Text>
+              <Text style={styles.primeAmount}>{contrat.prochainePrime}</Text>
+              <Text style={styles.primeDate}>le {contrat.dateProchainePrime}</Text>
+            </View>
+
+            <View style={styles.garantiesContainer}>
+              <Text style={styles.garantiesTitle}>Garanties principales :</Text>
+              <View style={styles.garantiesList}>
+                {contrat.garanties.slice(0, 2).map((garantie, index) => (
+                  <View key={index} style={styles.garantieTag}>
+                    <Text style={styles.garantieText}>{garantie}</Text>
+                  </View>
+                ))}
+                {contrat.garanties.length > 2 && (
+                  <View style={styles.garantieTag}>
+                    <Text style={styles.garantieText}>+{contrat.garanties.length - 2}</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.franchiseContainer}>
+              <Text style={styles.franchiseText}>Franchise : {contrat.franchise}</Text>
+            </View>
+          </>
+        )}
+
+        {isExpired && contrat.motifArret && (
+          <Text style={styles.motifArret}>Motif : {contrat.motifArret}</Text>
+        )}
+      </View>
+
+      <View style={styles.contratActions}>
+        {!isExpired ? (
+          <>
+            <TouchableOpacity style={styles.actionButton}>
+              <Ionicons name="document-text-outline" size={16} color="#3b82f6" />
+              <Text style={styles.actionText}>Voir détails</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <TouchableOpacity style={styles.actionButton}>
+            <Ionicons name="archive-outline" size={16} color="#6b7280" />
+            <Text style={styles.actionText}>Archiver</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    </TouchableOpacity>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1E40AF" />
+      <StatusBar barStyle="light-content" backgroundColor="#FFF" />
       
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <View style={styles.avatarContainer}>
-              <Ionicons name="person" size={24} color="white" />
-            </View>
-            <View>
-              <Text style={styles.welcomeText}>Bienvenu(e) sur Oremi</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.notificationContainer}>
-            <Ionicons name="notifications" size={24} color="white" />
-            {notifications > 0 && (
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationCount}>{notifications}</Text>
+        <View style={styles.headerTop}>
+          <TouchableOpacity style={styles.backButton} onPress={()=> goBack()}>
+            <Ionicons name="arrow-back" size={20} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Stats rapides */}
+      <View style={styles.statsContainer}>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>3</Text>
+          <Text style={styles.statLabel}>Contrats actifs</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>-25%</Text>
+          <Text style={styles.statLabel}>vs marché</Text>
+        </View>
+      </View>
+
+      {/* Tabs */}
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'actifs' && styles.activeTab]}
+          onPress={() => setActiveTab('actifs')}
+        >
+          <Text style={[styles.tabText, activeTab === 'actifs' && styles.activeTabText]}>
+            Contrats Actifs
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'expires' && styles.activeTab]}
+          onPress={() => setActiveTab('expires')}
+        >
+          <Text style={[styles.tabText, activeTab === 'expires' && styles.activeTabText]}>
+            Historique
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {activeTab === 'actifs' ? (
+          <>
+            {contratsActifs.map(contrat => renderContratCard(contrat))}
+            
+            {/* Suggestion nouveau contrat */}
+            <TouchableOpacity style={styles.suggestionCard}>
+              <View style={styles.suggestionHeader}>
+                <Ionicons name="bulb-outline" size={24} color="#10b981" />
+                <Text style={styles.suggestionTitle}>Suggestion Oremi AI</Text>
+              </View>
+              <Text style={styles.suggestionText}>
+                📱 Vous n'avez pas d'assurance mobile. Protégez votre smartphone dès 8 FCFA/mois !
+              </Text>
+              <TouchableOpacity style={styles.suggestionButton}>
+                <Text style={styles.suggestionButtonText}>Découvrir</Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            {contratsExpires.map(contrat => renderContratCard(contrat, true))}
+            {contratsExpires.length === 0 && (
+              <View style={styles.emptyState}>
+                <Ionicons name="archive-outline" size={48} color="#9ca3af" />
+                <Text style={styles.emptyTitle}>Aucun contrat expiré</Text>
+                <Text style={styles.emptyText}>Vos anciens contrats apparaîtront ici</Text>
               </View>
             )}
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <ScrollView style={styles.mainContent} showsVerticalScrollIndicator={false}>
-        {/* Insurance Products */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Nos produits d'assurance</Text>
-          <View style={styles.productsGrid}>
-            {insuranceProducts.map((product) => (
-              <TouchableOpacity
-                key={product.id}
-                style={[
-                  styles.productCard,
-                  { backgroundColor: product.colors[0] }
-                ]}
-                onPress={() => Alert.alert(product.name, product.description)}
-              >
-                <Text style={styles.productName}>{product.name}</Text>
-                <View style={styles.productIcon}>
-                  <Text style={styles.productEmoji}>{product.icon}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* Help Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Besoin d'aide ?</Text>
-          
-          {/* Assistant */}
-          <TouchableOpacity
-            style={styles.helpCard}
-            onPress={() => setShowAssistant(true)}
-          >
-            <View style={styles.helpContent}>
-              <View style={[styles.helpIcon, { backgroundColor: '#3B82F6' }]}>
-                <Ionicons name="chatbubble-ellipses" size={20} color="white" />
-              </View>
-              <View style={styles.helpText}>
-                <Text style={styles.helpTitle}>Assistant intelligent</Text>
-                <Text style={styles.helpSubtitle}>Posez vos questions, je vous aide !</Text>
-              </View>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-          </TouchableOpacity>
-
-          {/* Scanner */}
-          <TouchableOpacity style={styles.helpCard}>
-            <View style={styles.helpContent}>
-              <View style={[styles.helpIcon, { backgroundColor: '#10B981' }]}>
-                <Ionicons name="camera" size={20} color="white" />
-              </View>
-              <View style={styles.helpText}>
-                <Text style={styles.helpTitle}>Scanner de documents</Text>
-                <Text style={styles.helpSubtitle}>Scannez vos papiers facilement</Text>
-              </View>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-          </TouchableOpacity>
-
-          {/* About */}
-          <TouchableOpacity style={styles.helpCard}>
-            <View style={styles.helpContent}>
-              <View style={[styles.helpIcon, { backgroundColor: '#6B7280' }]}>
-                <Ionicons name="information-circle" size={20} color="white" />
-              </View>
-              <View style={styles.helpText}>
-                <Text style={styles.helpTitle}>À propos de nous</Text>
-                <Text style={styles.helpSubtitle}>Découvrez Oremi AFG</Text>
-              </View>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-          </TouchableOpacity>
-        </View>
+          </>
+        )}
       </ScrollView>
 
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
-          <Ionicons name="home" size={24} color="#10B981" />
-          <Text style={[styles.navText, styles.activeNavText]}>Accueil</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="shield-checkmark" size={24} color="#9CA3AF" />
-          <Text style={styles.navText}>Assurances</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="flag" size={24} color="#9CA3AF" />
-          <Text style={styles.navText}>Sinistres</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="person" size={24} color="#9CA3AF" />
-          <Text style={styles.navText}>Compte</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Assistant Modal */}
-      <Modal
-        visible={showAssistant}
-        animationType="slide"
-        presentationStyle="fullScreen"
-      >
-        <SafeAreaView style={styles.chatContainer}>
-          <StatusBar barStyle="light-content" backgroundColor="#1E40AF" />
-          
-          {/* Chat Header */}
-          <View style={styles.chatHeader}>
-            <View style={styles.chatHeaderLeft}>
-              <View style={styles.chatAvatar}>
-                <Ionicons name="chatbubble-ellipses" size={20} color="white" />
-              </View>
-              <View>
-                <Text style={styles.chatTitle}>Assistant Oremi</Text>
-                <Text style={styles.chatStatus}>En ligne</Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowAssistant(false)}
-            >
-              <Ionicons name="close" size={24} color="white" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Messages */}
-          <KeyboardAvoidingView 
-            style={styles.chatContent}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          >
-            <FlatList
-              ref={flatListRef}
-              data={messages}
-              renderItem={renderMessage}
-              keyExtractor={(item) => item.id.toString()}
-              style={styles.messagesList}
-              onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
-              showsVerticalScrollIndicator={false}
-              ListFooterComponent={isTyping ? <TypingIndicator /> : null}
-            />
-
-            {/* Quick Questions */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.quickQuestionsContainer}
-            >
-              {quickQuestions.map((question, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.quickQuestionButton}
-                  onPress={() => handleQuickQuestion(question)}
-                >
-                  <Text style={styles.quickQuestionText}>{question}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            {/* Input */}
-            <View style={styles.inputContainer}>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  style={styles.textInput}
-                  value={inputMessage}
-                  onChangeText={setInputMessage}
-                  placeholder="Tapez votre message..."
-                  placeholderTextColor="#9CA3AF"
-                  multiline
-                  onSubmitEditing={handleSendMessage}
-                />
-                <TouchableOpacity style={styles.micButton}>
-                  <Ionicons name="mic" size={20} color="#9CA3AF" />
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity
-                style={[
-                  styles.sendButton,
-                  { opacity: inputMessage.trim() ? 1 : 0.5 }
-                ]}
-                onPress={handleSendMessage}
-                disabled={!inputMessage.trim()}
-              >
-                <Ionicons name="send" size={20} color="white" />
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
-      </Modal>
+      {/* FAB pour nouveau contrat */}
+      <TouchableOpacity style={styles.fab}>
+        <Ionicons name="add" size={24} color="#ffffff" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -429,313 +260,324 @@ const OremiApp = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: '#1E40AF',
     paddingVertical: 20,
-    paddingHorizontal: 16,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
   },
-  headerContent: {
+  headerTop: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 30,
   },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  backButton: {
+    backgroundColor: '#01548b',
+    padding: 5,
+    borderRadius: 15,
   },
-  avatarContainer: {
-    width: 48,
-    height: 48,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  welcomeText: {
-    color: 'white',
+  headerTitle: {
     fontSize: 18,
-    fontWeight: '500',
-  },
-  notificationContainer: {
-    width: 48,
-    height: 48,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
-  },
-  notificationBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    width: 20,
-    height: 20,
-    backgroundColor: '#EF4444',
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  notificationCount: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  mainContent: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  section: {
-    marginVertical: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 16,
-  },
-  productsGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  productCard: {
-    width: '48%',
-    height: 120,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    position: 'relative',
-  },
-  productName: {
-    fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: '#ffffff',
   },
-  productIcon: {
-    position: 'absolute',
-    bottom: 12,
-    right: 12,
+  addButton: {
+    padding: 5,
   },
-  productEmoji: {
-    fontSize: 32,
-  },
-  helpCard: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
+  statsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    gap: 10,
   },
-  helpContent: {
+  statCard: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  statNumber: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1f2937',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 2,
+  },
+  tabsContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  tab: {
     flex: 1,
-  },
-  helpIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
+    paddingVertical: 12,
     alignItems: 'center',
-    marginRight: 12,
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
   },
-  helpText: {
-    flex: 1,
+  activeTab: {
+    borderBottomColor: '#01548b',
   },
-  helpTitle: {
+  tabText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#1F2937',
+    color: '#6b7280',
+  },
+  activeTabText: {
+    color: '#01548b',
+    fontWeight: '600',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  contratCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  expiredCard: {
+    opacity: 0.7,
+  },
+  contratHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    paddingBottom: 15,
+  },
+  contratIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  contratHeaderInfo: {
+    flex: 1,
+  },
+  contratType: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#01548b',
     marginBottom: 2,
   },
-  helpSubtitle: {
-    fontSize: 14,
-    color: '#6B7280',
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    paddingVertical: 8,
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  activeNavItem: {
-    // Styles pour l'item actif
-  },
-  navText: {
-    fontSize: 12,
-    color: '#9CA3AF',
-    marginTop: 4,
-  },
-  activeNavText: {
-    color: '#10B981',
-  },
-  // Styles pour le chat
-  chatContainer: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
-  },
-  chatHeader: {
-    backgroundColor: '#1E40AF',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  chatHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  chatAvatar: {
-    width: 40,
-    height: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  chatTitle: {
-    color: 'white',
+  contratNom: {
     fontSize: 16,
     fontWeight: '500',
+    color: '#374151',
   },
-  chatStatus: {
-    color: '#93C5FD',
+  expiredText: {
+    color: '#9ca3af',
+  },
+  statutBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  actifBadge: {
+    backgroundColor: '#dcfce7',
+  },
+  expireBadge: {
+    backgroundColor: '#fee2e2',
+  },
+  statutText: {
     fontSize: 12,
+    fontWeight: '600',
   },
-  closeButton: {
-    width: 32,
-    height: 32,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+  actifText: {
+    color: '#16a34a',
   },
-  chatContent: {
-    flex: 1,
+  expireText: {
+    color: '#dc2626',
   },
-  messagesList: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
+  contratDetails: {
+    paddingHorizontal: 20,
+    paddingBottom: 15,
   },
-  messageContainer: {
-    marginBottom: 16,
+  contratNumero: {
+    fontSize: 13,
+    color: '#6b7280',
+    marginBottom: 8,
   },
-  userMessage: {
-    alignItems: 'flex-end',
-  },
-  botMessage: {
-    alignItems: 'flex-start',
-  },
-  messageBubble: {
-    maxWidth: '80%',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-  },
-  userBubble: {
-    backgroundColor: '#3B82F6',
-  },
-  botBubble: {
-    backgroundColor: '#F3F4F6',
-  },
-  messageText: {
+  contratInfo: {
     fontSize: 14,
-    lineHeight: 20,
+    color: '#374151',
+    marginBottom: 5,
   },
-  userText: {
-    color: 'white',
+  datesContainer: {
+    marginVertical: 10,
   },
-  botText: {
-    color: '#1F2937',
+  dateText: {
+    fontSize: 13,
+    color: '#6b7280',
   },
-  messageTime: {
-    fontSize: 12,
-    marginTop: 4,
-  },
-  userTime: {
-    color: '#93C5FD',
-  },
-  botTime: {
-    color: '#9CA3AF',
-  },
-  typingContainer: {
+  primeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginVertical: 10,
+    padding: 12,
+    backgroundColor: '#f8fafc',
+    borderRadius: 8,
   },
-  typingDot: {
-    width: 8,
-    height: 8,
-    backgroundColor: '#9CA3AF',
-    borderRadius: 4,
-    marginHorizontal: 2,
-  },
-  quickQuestionsContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  quickQuestionButton: {
-    backgroundColor: '#EBF8FF',
-    borderRadius: 20,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+  primeLabel: {
+    fontSize: 14,
+    color: '#374151',
     marginRight: 8,
   },
-  quickQuestionText: {
-    color: '#2563EB',
-    fontSize: 12,
+  primeAmount: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#01548b',
+    marginRight: 8,
   },
-  inputContainer: {
+  primeDate: {
+    fontSize: 13,
+    color: '#6b7280',
+  },
+  garantiesContainer: {
+    marginVertical: 10,
+  },
+  garantiesTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 8,
+  },
+  garantiesList: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    flexWrap: 'wrap',
+    gap: 5,
+  },
+  garantieTag: {
+    backgroundColor: '#e0f2fe',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  garantieText: {
+    fontSize: 11,
+    color: '#0284c7',
+    fontWeight: '500',
+  },
+  franchiseContainer: {
+    marginTop: 10,
+  },
+  franchiseText: {
+    fontSize: 13,
+    color: '#6b7280',
+    fontStyle: 'italic',
+  },
+  motifArret: {
+    fontSize: 13,
+    color: '#dc2626',
+    fontStyle: 'italic',
+    marginTop: 8,
+  },
+  contratActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: '#f3f4f6',
   },
-  inputWrapper: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  textInput: {
-    flex: 1,
+  actionText: {
     fontSize: 14,
-    color: '#1F2937',
-    maxHeight: 100,
+    color: '#374151',
+    marginLeft: 5,
+    fontWeight: '500',
   },
-  micButton: {
+  suggestionCard: {
+    backgroundColor: '#FFF',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#10b981',
+  },
+  suggestionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  suggestionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#92400e',
     marginLeft: 8,
   },
-  sendButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#3B82F6',
+  suggestionText: {
+    fontSize: 14,
+    color: '#78716c',
+    lineHeight: 20,
+    marginBottom: 15,
+  },
+  suggestionButton: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#10b981',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 20,
+  },
+  suggestionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#ffffff',
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#374151',
+    marginTop: 15,
+    marginBottom: 5,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: '#6b7280',
+    textAlign: 'center',
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#01548b',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
   },
 });
 
-export default OremiApp;
+export default OremiAssurancesScreen;

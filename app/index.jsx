@@ -4,6 +4,8 @@ import { StatusBar } from "react-native";
 import Notfound from "./+not-found";
 import TabsNavigation from "./Screens/TabsNavigation/_layout";
 import AI from "./Screens/TabsNavigation/HomeScreen";
+import Bonus from './Screens/Affiliation/OremiBonusWalletScreen';
+import Affiliation from './Screens/Affiliation/OremiAffiliationScreen';
 
 const Stack = createStackNavigator();
 
@@ -20,7 +22,8 @@ const AppNavigator = () => {
       >
         {/* App Screens */}
         <Stack.Screen name="HomeScreen" component={TabsNavigation} />
-        {/* <Stack.Screen name="AiScreen" component={AI} /> */}
+        <Stack.Screen name="Affiliation" component={Affiliation} />
+        <Stack.Screen name="Bonus" component={Bonus} />
         
         {/* Common */}
         <Stack.Screen name="Notfound" component={Notfound} />

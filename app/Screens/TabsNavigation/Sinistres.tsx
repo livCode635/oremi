@@ -1,427 +1,315 @@
-// App.js - Oremi React Native App
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  TextInput,
-  Modal,
-  FlatList,
   StatusBar,
+  TouchableOpacity,
+  ScrollView,
   SafeAreaView,
-  KeyboardAvoidingView,
-  Platform,
-  Animated,
-  Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { goBack } from 'expo-router/build/global-state/routing';
 
-const OremiApp = () => {
-  const [showAssistant, setShowAssistant] = useState(false);
-  const [messages, setMessages] = useState([
+const OremiSinistresScreen = () => {
+  const [activeTab, setActiveTab] = useState('encours');
+
+  const sinistresEnCours = [
     {
       id: 1,
-      text: "Bonjour ! Je suis votre assistant Oremi. Comment puis-je vous aider aujourd'hui ?",
-      sender: 'bot',
-      time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-    }
-  ]);
-  const [inputMessage, setInputMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
-  const [notifications] = useState(3);
-  const flatListRef = useRef(null);
-  const typingAnimation = useRef(new Animated.Value(0)).current;
-
-  // Animation pour l'indicateur de frappe
-  useEffect(() => {
-    if (isTyping) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(typingAnimation, {
-            toValue: 1,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-          Animated.timing(typingAnimation, {
-            toValue: 0,
-            duration: 600,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    }
-  }, [isTyping]);
-
-  const handleSendMessage = () => {
-    if (inputMessage.trim()) {
-      const newMessage = {
-        id: Date.now(),
-        text: inputMessage,
-        sender: 'user',
-        time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-      };
-      
-      setMessages(prev => [...prev, newMessage]);
-      setInputMessage('');
-      setIsTyping(true);
-
-      // Simulation de réponse du bot
-      setTimeout(() => {
-        const botResponse = getBotResponse(inputMessage);
-        setMessages(prev => [...prev, {
-          id: Date.now() + 1,
-          text: botResponse,
-          sender: 'bot',
-          time: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-        }]);
-        setIsTyping(false);
-      }, 1500);
-    }
-  };
-
-  const getBotResponse = (userMessage) => {
-    const message = userMessage.toLowerCase();
-    
-    if (message.includes('assurance auto') || message.includes('voiture')) {
-      return "Pour une assurance automobile, je peux vous aider à obtenir un devis en quelques minutes. Souhaitez-vous commencer la souscription ou avez-vous des questions spécifiques ?";
-    } else if (message.includes('moto')) {
-      return "Excellent choix ! Notre assurance moto couvre les 2 et 3 roues. Quel type de moto souhaitez-vous assurer ?";
-    } else if (message.includes('habitation') || message.includes('maison')) {
-      return "L'assurance habitation Oremi vous protège contre les risques d'incendie, vol, dégâts des eaux. Voulez-vous une estimation ?";
-    } else if (message.includes('voyage')) {
-      return "Notre assurance voyage vous couvre à l'international. Quelle est votre destination et la durée de votre séjour ?";
-    } else if (message.includes('prix') || message.includes('coût') || message.includes('tarif')) {
-      return "Les tarifs varient selon vos besoins. Je peux vous faire une estimation personnalisée. Quel type d'assurance vous intéresse ?";
-    } else if (message.includes('sinistre') || message.includes('accident')) {
-      return "En cas de sinistre, vous pouvez déclarer directement via l'app. Avez-vous un sinistre à déclarer maintenant ?";
-    } else if (message.includes('affiliation') || message.includes('parrainage')) {
-      return "Notre programme d'affiliation vous permet de gagner des commissions en parrainant de nouveaux clients. Voulez-vous en savoir plus ?";
-    } else if (message.includes('scanner') || message.includes('document')) {
-      return "Le scanner de documents vous permet de numériser vos papiers d'identité, permis de conduire, etc. directement avec votre téléphone. Très pratique pour vos souscriptions !";
-    } else {
-      return "Je suis là pour vous aider avec vos assurances. Vous pouvez me poser des questions sur nos produits : Auto, Moto, Habitation, Voyage, ou sur notre programme d'affiliation. Que souhaitez-vous savoir ?";
-    }
-  };
-
-  const quickQuestions = [
-    "Assurance auto pas chère",
-    "Comment déclarer un sinistre ?",
-    "Devis assurance moto",
-    "Programme d'affiliation",
-    "Scanner de documents",
-    "Assurance voyage international"
-  ];
-
-  const insuranceProducts = [
-    {
-      id: 1,
-      name: 'Voiture',
-      icon: '🚗',
-      colors: ['#A7F3D0', '#34D399'],
-      description: 'Protection complète pour votre véhicule'
+      numeroDossier: 'SIN789456',
+      type: 'Accident Auto',
+      contrat: 'AUTO789456',
+      dateDeclaration: '12/12/2024',
+      dateSinistre: '10/12/2024',
+      statut: 'Expertise en cours',
+      description: 'Collision en stationnement - Place de la République',
+      expert: {
+        nom: 'M. Martin',
+        telephone: '06.12.34.56.78',
+        email: 'martin@expertise.com',
+      },
+      franchise: '200 FCFA',
+      indemnisation: 'En cours d\'évaluation',
+      prochainEtape: 'Rapport d\'expertise sous 48h',
+      icon: 'car-sport',
+      color: '#f59e0b',
+      backgroundColor: '#fef3c7',
+      progression: 60,
     },
     {
       id: 2,
-      name: 'Moto',
-      icon: '🏍️',
-      colors: ['#FDE68A', '#F59E0B'],
-      description: 'Assurance 2 et 3 roues'
+      numeroDossier: 'SIN654321',
+      type: 'Dégât des Eaux',
+      contrat: 'HAB456123',
+      dateDeclaration: '08/12/2024',
+      dateSinistre: '07/12/2024',
+      statut: 'Travaux en cours',
+      description: 'Fuite canalisation cuisine - Appartement Paris 15e',
+      expert: {
+        nom: 'Mme Dubois',
+        telephone: '06.98.76.54.32',
+        email: 'dubois@expertise.com',
+      },
+      franchise: '150 FCFA',
+      indemnisation: '1,850 FCFA validé',
+      prochainEtape: 'Fin travaux prévue 20/12/2024',
+      icon: 'water',
+      color: '#3b82f6',
+      backgroundColor: '#eff6ff',
+      progression: 80,
     },
+  ];
+
+  const sinistresTermines = [
     {
       id: 3,
-      name: 'Voyage',
-      icon: '🧳',
-      colors: ['#FBBF24', '#F59E0B'],
-      description: 'Voyagez en toute sérénité'
+      numeroDossier: 'SIN123789',
+      type: 'Bris de Glace',
+      contrat: 'AUTO789456',
+      dateDeclaration: '15/11/2024',
+      dateSinistre: '14/11/2024',
+      dateClôture: '22/11/2024',
+      statut: 'Terminé',
+      description: 'Impact pare-brise - Autoroute A6',
+      franchise: '50 FCFA',
+      indemnisation: '280 FCFA versé',
+      dureeTraitement: '7 jours',
+      icon: 'car-sport',
+      color: '#10b981',
+      backgroundColor: '#ecfdf5',
     },
     {
       id: 4,
-      name: 'Habitation',
-      icon: '🏠',
-      colors: ['#93C5FD', '#3B82F6'],
-      description: 'Protégez votre foyer'
-    }
+      numeroDossier: 'SIN987654',
+      type: 'Vol Habitation',
+      contrat: 'HAB456123',
+      dateDeclaration: '03/10/2024',
+      dateSinistre: '02/10/2024',
+      dateClôture: '15/10/2024',
+      statut: 'Terminé',
+      description: 'Cambriolage pendant absence - Ordinateur portable volé',
+      franchise: '150 FCFA',
+      indemnisation: '920 FCFA versé',
+      dureeTraitement: '12 jours',
+      icon: 'shield-outline',
+      color: '#10b981',
+      backgroundColor: '#ecfdf5',
+    },
   ];
 
-  const handleQuickQuestion = (question) => {
-    setInputMessage(question);
-    setTimeout(() => handleSendMessage(), 100);
+  const getStatutColor = (statut) => {
+    switch (statut) {
+      case 'Terminé':
+        return { color: '#16a34a', backgroundColor: '#dcfce7' };
+      case 'Expertise en cours':
+        return { color: '#d97706', backgroundColor: '#fef3c7' };
+      case 'Travaux en cours':
+        return { color: '#3b82f6', backgroundColor: '#eff6ff' };
+      default:
+        return { color: '#6b7280', backgroundColor: '#f3f4f6' };
+    }
   };
 
-  const renderMessage = ({ item }) => (
-    <View style={[
-      styles.messageContainer,
-      item.sender === 'user' ? styles.userMessage : styles.botMessage
-    ]}>
-      <View style={[
-        styles.messageBubble,
-        item.sender === 'user' ? styles.userBubble : styles.botBubble
-      ]}>
-        <Text style={[
-          styles.messageText,
-          item.sender === 'user' ? styles.userText : styles.botText
-        ]}>
-          {item.text}
-        </Text>
-        <Text style={[
-          styles.messageTime,
-          item.sender === 'user' ? styles.userTime : styles.botTime
-        ]}>
-          {item.time}
-        </Text>
-      </View>
-    </View>
-  );
-
-  const TypingIndicator = () => (
-    <View style={[styles.messageContainer, styles.botMessage]}>
-      <View style={[styles.messageBubble, styles.botBubble]}>
-        <View style={styles.typingContainer}>
-          <Animated.View style={[
-            styles.typingDot,
-            {
-              opacity: typingAnimation.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0.3, 1],
-              }),
-            }
-          ]} />
-          <Animated.View style={[
-            styles.typingDot,
-            {
-              opacity: typingAnimation.interpolate({
-                inputRange: [0, 0.5, 1],
-                outputRange: [0.3, 1, 0.3],
-              }),
-            }
-          ]} />
-          <Animated.View style={[
-            styles.typingDot,
-            {
-              opacity: typingAnimation.interpolate({
-                inputRange: [0, 1],
-                outputRange: [1, 0.3],
-              }),
-            }
-          ]} />
+  const renderSinistreCard = (sinistre, isTermine = false) => (
+    <TouchableOpacity key={sinistre.id} style={styles.sinistreCard}>
+      <View style={styles.sinistreHeader}>
+        <View style={[styles.sinistreIcon, { backgroundColor: sinistre.backgroundColor }]}>
+          <Ionicons name={sinistre.icon} size={24} color={sinistre.color} />
+        </View>
+        <View style={styles.sinistreHeaderInfo}>
+          <Text style={styles.sinistreType}>{sinistre.type}</Text>
+          <Text style={styles.numeroDossier}>Dossier {sinistre.numeroDossier}</Text>
+        </View>
+        <View style={[styles.statutBadge, getStatutColor(sinistre.statut)]}>
+          <Text style={[styles.statutText, { color: getStatutColor(sinistre.statut).color }]}>
+            {sinistre.statut}
+          </Text>
         </View>
       </View>
-    </View>
+
+      <View style={styles.sinistreDetails}>
+        <Text style={styles.description}>{sinistre.description}</Text>
+        
+        <View style={styles.datesContainer}>
+          <View style={styles.dateItem}>
+            <Text style={styles.dateLabel}>Sinistre :</Text>
+            <Text style={styles.dateValue}>{sinistre.dateSinistre}</Text>
+          </View>
+          <View style={styles.dateItem}>
+            <Text style={styles.dateLabel}>Déclaration :</Text>
+            <Text style={styles.dateValue}>{sinistre.dateDeclaration}</Text>
+          </View>
+          {sinistre.dateClôture && (
+            <View style={styles.dateItem}>
+              <Text style={styles.dateLabel}>Clôture :</Text>
+              <Text style={styles.dateValue}>{sinistre.dateClôture}</Text>
+            </View>
+          )}
+        </View>
+
+        {!isTermine && sinistre.progression && (
+          <View style={styles.progressContainer}>
+            <View style={styles.progressHeader}>
+              <Text style={styles.progressLabel}>Avancement</Text>
+              <Text style={styles.progressPercentage}>{sinistre.progression}%</Text>
+            </View>
+            <View style={styles.progressBar}>
+              <View 
+                style={[styles.progressFill, { width: `${sinistre.progression}%` }]}
+              />
+            </View>
+          </View>
+        )}
+
+        <View style={styles.financialInfo}>
+          <View style={styles.financialItem}>
+            <Text style={styles.financialLabel}>Franchise :</Text>
+            <Text style={styles.financialValue}>{sinistre.franchise}</Text>
+          </View>
+          <View style={styles.financialItem}>
+            <Text style={styles.financialLabel}>Indemnisation :</Text>
+            <Text style={[
+              styles.financialValue,
+              isTermine ? styles.paidAmount : styles.pendingAmount
+            ]}>
+              {sinistre.indemnisation}
+            </Text>
+          </View>
+        </View>
+
+        {!isTermine && sinistre.expert && (
+          <View style={styles.expertContainer}>
+            <Text style={styles.expertTitle}>👤 Expert assigné :</Text>
+            <Text style={styles.expertName}>{sinistre.expert.nom}</Text>
+            <View style={styles.expertContact}>
+              <TouchableOpacity style={styles.contactButton}>
+                <Ionicons name="call" size={16} color="#3b82f6" />
+                <Text style={styles.contactText}>{sinistre.expert.telephone}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
+
+        {!isTermine && sinistre.prochainEtape && (
+          <View style={styles.nextStepContainer}>
+            <Text style={styles.nextStepTitle}>📋 Prochaine étape :</Text>
+            <Text style={styles.nextStepText}>{sinistre.prochainEtape}</Text>
+          </View>
+        )}
+
+        {isTermine && sinistre.dureeTraitement && (
+          <View style={styles.treatmentDuration}>
+            <Text style={styles.treatmentText}>
+              ⏱️ Traité en {sinistre.dureeTraitement}
+            </Text>
+          </View>
+        )}
+      </View>
+
+      <View style={styles.sinistreActions}>
+        {!isTermine ? (
+          <>
+            <TouchableOpacity style={styles.actionButton}>
+              <Ionicons name="document-text-outline" size={16} color="#6b7280" />
+              <Text style={styles.actionText}>Détails</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.actionButton}>
+              <Ionicons name="call-outline" size={16} color="#10b981" />
+              <Text style={styles.actionText}>Contacter</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            
+          </>
+        )}
+      </View>
+    </TouchableOpacity>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1E40AF" />
+      <StatusBar barStyle="light-content" backgroundColor="#FFF" />
       
       {/* Header */}
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerLeft}>
-            <View style={styles.avatarContainer}>
-              <Ionicons name="person" size={24} color="white" />
-            </View>
-            <View>
-              <Text style={styles.welcomeText}>Bienvenu(e) sur Oremi</Text>
-            </View>
-          </View>
-          <TouchableOpacity style={styles.notificationContainer}>
-            <Ionicons name="notifications" size={24} color="white" />
-            {notifications > 0 && (
-              <View style={styles.notificationBadge}>
-                <Text style={styles.notificationCount}>{notifications}</Text>
-              </View>
-            )}
+        <View style={styles.headerTop}>
+          <TouchableOpacity style={styles.backButton} onPress={()=> goBack()}>
+            <Ionicons name="arrow-back" size={20} color="#ffffff" />
           </TouchableOpacity>
         </View>
       </View>
 
-      <ScrollView style={styles.mainContent} showsVerticalScrollIndicator={false}>
-        {/* Insurance Products */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Nos produits d'assurance</Text>
-          <View style={styles.productsGrid}>
-            {insuranceProducts.map((product) => (
-              <TouchableOpacity
-                key={product.id}
-                style={[
-                  styles.productCard,
-                  { backgroundColor: product.colors[0] }
-                ]}
-                onPress={() => Alert.alert(product.name, product.description)}
-              >
-                <Text style={styles.productName}>{product.name}</Text>
-                <View style={styles.productIcon}>
-                  <Text style={styles.productEmoji}>{product.icon}</Text>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
+      {/* Stats rapides */}
+      <View style={styles.statsContainer}>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>2</Text>
+          <Text style={styles.statLabel}>En cours</Text>
         </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>4</Text>
+          <Text style={styles.statLabel}>Total</Text>
+        </View>
+        <View style={styles.statCard}>
+          <Text style={styles.statNumber}>9j</Text>
+          <Text style={styles.statLabel}>Délai moyen</Text>
+        </View>
+      </View>
 
-        {/* Help Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Besoin d'aide ?</Text>
+      {/* Tabs */}
+      <View style={styles.tabsContainer}>
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'encours' && styles.activeTab]}
+          onPress={() => setActiveTab('encours')}
+        >
+          <Text style={[styles.tabText, activeTab === 'encours' && styles.activeTabText]}>
+            En Cours (2)
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'termines' && styles.activeTab]}
+          onPress={() => setActiveTab('termines')}
+        >
+          <Text style={[styles.tabText, activeTab === 'termines' && styles.activeTabText]}>
+            Terminés (2)
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {activeTab === 'encours' ? (
+          <>
+            {sinistresEnCours.map(sinistre => renderSinistreCard(sinistre))}
+            
+          </>
+        ) : (
+          <>
+            {sinistresTermines.map(sinistre => renderSinistreCard(sinistre, true))}
           
-          {/* Assistant */}
-          <TouchableOpacity
-            style={styles.helpCard}
-            onPress={() => setShowAssistant(true)}
-          >
-            <View style={styles.helpContent}>
-              <View style={[styles.helpIcon, { backgroundColor: '#3B82F6' }]}>
-                <Ionicons name="chatbubble-ellipses" size={20} color="white" />
-              </View>
-              <View style={styles.helpText}>
-                <Text style={styles.helpTitle}>Assistant intelligent</Text>
-                <Text style={styles.helpSubtitle}>Posez vos questions, je vous aide !</Text>
-              </View>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-          </TouchableOpacity>
+          </>
+        )}
 
-          {/* Scanner */}
-          <TouchableOpacity style={styles.helpCard}>
-            <View style={styles.helpContent}>
-              <View style={[styles.helpIcon, { backgroundColor: '#10B981' }]}>
-                <Ionicons name="camera" size={20} color="white" />
-              </View>
-              <View style={styles.helpText}>
-                <Text style={styles.helpTitle}>Scanner de documents</Text>
-                <Text style={styles.helpSubtitle}>Scannez vos papiers facilement</Text>
-              </View>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-          </TouchableOpacity>
-
-          {/* About */}
-          <TouchableOpacity style={styles.helpCard}>
-            <View style={styles.helpContent}>
-              <View style={[styles.helpIcon, { backgroundColor: '#6B7280' }]}>
-                <Ionicons name="information-circle" size={20} color="white" />
-              </View>
-              <View style={styles.helpText}>
-                <Text style={styles.helpTitle}>À propos de nous</Text>
-                <Text style={styles.helpSubtitle}>Découvrez Oremi AFG</Text>
-              </View>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-          </TouchableOpacity>
-        </View>
+        {/* Action rapide */}
+        <TouchableOpacity style={styles.quickActionCard}>
+          <View style={styles.quickActionHeader}>
+            <Ionicons name="flash" size={24} color="#1e3a8a" />
+            <Text style={styles.quickActionTitle}>Déclarer un nouveau sinistre</Text>
+          </View>
+          <Text style={styles.quickActionText}>
+            Accident, vol, dégât... Déclarez en 2 minutes avec notre assistant intelligent
+          </Text>
+          <View style={styles.quickActionButton}>
+            <Text style={styles.quickActionButtonText}>Commencer la déclaration</Text>
+            <Ionicons name="arrow-forward" size={16} color="#ffffff" />
+          </View>
+        </TouchableOpacity>
       </ScrollView>
 
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
-          <Ionicons name="home" size={24} color="#10B981" />
-          <Text style={[styles.navText, styles.activeNavText]}>Accueil</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="shield-checkmark" size={24} color="#9CA3AF" />
-          <Text style={styles.navText}>Assurances</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="flag" size={24} color="#9CA3AF" />
-          <Text style={styles.navText}>Sinistres</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Ionicons name="person" size={24} color="#9CA3AF" />
-          <Text style={styles.navText}>Compte</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Assistant Modal */}
-      <Modal
-        visible={showAssistant}
-        animationType="slide"
-        presentationStyle="fullScreen"
-      >
-        <SafeAreaView style={styles.chatContainer}>
-          <StatusBar barStyle="light-content" backgroundColor="#1E40AF" />
-          
-          {/* Chat Header */}
-          <View style={styles.chatHeader}>
-            <View style={styles.chatHeaderLeft}>
-              <View style={styles.chatAvatar}>
-                <Ionicons name="chatbubble-ellipses" size={20} color="white" />
-              </View>
-              <View>
-                <Text style={styles.chatTitle}>Assistant Oremi</Text>
-                <Text style={styles.chatStatus}>En ligne</Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowAssistant(false)}
-            >
-              <Ionicons name="close" size={24} color="white" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Messages */}
-          <KeyboardAvoidingView 
-            style={styles.chatContent}
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          >
-            <FlatList
-              ref={flatListRef}
-              data={messages}
-              renderItem={renderMessage}
-              keyExtractor={(item) => item.id.toString()}
-              style={styles.messagesList}
-              onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
-              showsVerticalScrollIndicator={false}
-              ListFooterComponent={isTyping ? <TypingIndicator /> : null}
-            />
-
-            {/* Quick Questions */}
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              style={styles.quickQuestionsContainer}
-            >
-              {quickQuestions.map((question, index) => (
-                <TouchableOpacity
-                  key={index}
-                  style={styles.quickQuestionButton}
-                  onPress={() => handleQuickQuestion(question)}
-                >
-                  <Text style={styles.quickQuestionText}>{question}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-
-            {/* Input */}
-            <View style={styles.inputContainer}>
-              <View style={styles.inputWrapper}>
-                <TextInput
-                  style={styles.textInput}
-                  value={inputMessage}
-                  onChangeText={setInputMessage}
-                  placeholder="Tapez votre message..."
-                  placeholderTextColor="#9CA3AF"
-                  multiline
-                  onSubmitEditing={handleSendMessage}
-                />
-                <TouchableOpacity style={styles.micButton}>
-                  <Ionicons name="mic" size={20} color="#9CA3AF" />
-                </TouchableOpacity>
-              </View>
-              <TouchableOpacity
-                style={[
-                  styles.sendButton,
-                  { opacity: inputMessage.trim() ? 1 : 0.5 }
-                ]}
-                onPress={handleSendMessage}
-                disabled={!inputMessage.trim()}
-              >
-                <Ionicons name="send" size={20} color="white" />
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
-        </SafeAreaView>
-      </Modal>
+      {/* FAB pour nouveau sinistre */}
+      <TouchableOpacity style={styles.fab}>
+        <Ionicons name="alert-circle" size={24} color="#ffffff" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -429,313 +317,422 @@ const OremiApp = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#f9fafb',
   },
   header: {
-    backgroundColor: '#1E40AF',
     paddingVertical: 20,
-    paddingHorizontal: 16,
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
   },
-  headerContent: {
+  headerTop: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 30,
   },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  backButton: {
+    backgroundColor: '#01548b',
+    padding: 5,
+    borderRadius: 15,
   },
-  avatarContainer: {
-    width: 48,
-    height: 48,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  welcomeText: {
-    color: 'white',
+  headerTitle: {
     fontSize: 18,
-    fontWeight: '500',
+    fontWeight: '600',
+    color: '#ffffff',
   },
-  notificationContainer: {
-    width: 48,
-    height: 48,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative',
+  addButton: {
+    padding: 5,
   },
-  notificationBadge: {
-    position: 'absolute',
-    top: -4,
-    right: -4,
-    width: 20,
-    height: 20,
-    backgroundColor: '#EF4444',
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  notificationCount: {
-    color: 'white',
-    fontSize: 12,
-    fontWeight: 'bold',
-  },
-  mainContent: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  section: {
-    marginVertical: 24,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1F2937',
-    marginBottom: 16,
-  },
-  productsGrid: {
+  statsContainer: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    gap: 10,
   },
-  productCard: {
-    width: '48%',
-    height: 120,
+  statCard: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 15,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1f2937',
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginTop: 2,
+  },
+  tabsContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  activeTab: {
+    borderBottomColor: '#1e3a8a',
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: '#6b7280',
+  },
+  activeTabText: {
+    color: '#1e3a8a',
+    fontWeight: '600',
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+  sinistreCard: {
+    backgroundColor: '#ffffff',
     borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
-    position: 'relative',
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  productName: {
+  sinistreHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
+    paddingBottom: 15,
+  },
+  sinistreIcon: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  sinistreHeaderInfo: {
+    flex: 1,
+  },
+  sinistreType: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
-  },
-  productIcon: {
-    position: 'absolute',
-    bottom: 12,
-    right: 12,
-  },
-  productEmoji: {
-    fontSize: 32,
-  },
-  helpCard: {
-    backgroundColor: '#F9FAFB',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  helpContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  helpIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  helpText: {
-    flex: 1,
-  },
-  helpTitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1F2937',
+    color: '#374151',
     marginBottom: 2,
   },
-  helpSubtitle: {
-    fontSize: 14,
-    color: '#6B7280',
+  numeroDossier: {
+    fontSize: 13,
+    color: '#6b7280',
   },
-  bottomNav: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    paddingVertical: 8,
+  statutBadge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
   },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    paddingVertical: 8,
-  },
-  activeNavItem: {
-    // Styles pour l'item actif
-  },
-  navText: {
+  statutText: {
     fontSize: 12,
-    color: '#9CA3AF',
-    marginTop: 4,
+    fontWeight: '600',
   },
-  activeNavText: {
-    color: '#10B981',
+  sinistreDetails: {
+    paddingHorizontal: 20,
+    paddingBottom: 15,
   },
-  // Styles pour le chat
-  chatContainer: {
-    flex: 1,
-    backgroundColor: '#FFFFFF',
+  description: {
+    fontSize: 14,
+    color: '#374151',
+    marginBottom: 15,
+    lineHeight: 20,
   },
-  chatHeader: {
-    backgroundColor: '#1E40AF',
-    paddingVertical: 16,
-    paddingHorizontal: 16,
+  datesContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+    paddingVertical: 10,
+    backgroundColor: '#f8fafc',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+  },
+  dateItem: {
+    alignItems: 'center',
+  },
+  dateLabel: {
+    fontSize: 11,
+    color: '#6b7280',
+    marginBottom: 2,
+  },
+  dateValue: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  progressContainer: {
+    marginBottom: 15,
+  },
+  progressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
   },
-  chatHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  chatAvatar: {
-    width: 40,
-    height: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  chatTitle: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  chatStatus: {
-    color: '#93C5FD',
-    fontSize: 12,
-  },
-  closeButton: {
-    width: 32,
-    height: 32,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  chatContent: {
-    flex: 1,
-  },
-  messagesList: {
-    flex: 1,
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  messageContainer: {
-    marginBottom: 16,
-  },
-  userMessage: {
-    alignItems: 'flex-end',
-  },
-  botMessage: {
-    alignItems: 'flex-start',
-  },
-  messageBubble: {
-    maxWidth: '80%',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 16,
-  },
-  userBubble: {
-    backgroundColor: '#3B82F6',
-  },
-  botBubble: {
-    backgroundColor: '#F3F4F6',
-  },
-  messageText: {
+  progressLabel: {
     fontSize: 14,
-    lineHeight: 20,
+    fontWeight: '500',
+    color: '#374151',
   },
-  userText: {
-    color: 'white',
+  progressPercentage: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1e3a8a',
   },
-  botText: {
-    color: '#1F2937',
+  progressBar: {
+    height: 6,
+    backgroundColor: '#e5e7eb',
+    borderRadius: 3,
+    overflow: 'hidden',
   },
-  messageTime: {
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#1e3a8a',
+  },
+  financialInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 15,
+    padding: 12,
+    backgroundColor: '#f1f5f9',
+    borderRadius: 8,
+  },
+  financialItem: {
+    alignItems: 'center',
+  },
+  financialLabel: {
     fontSize: 12,
-    marginTop: 4,
+    color: '#6b7280',
+    marginBottom: 4,
   },
-  userTime: {
-    color: '#93C5FD',
+  financialValue: {
+    fontSize: 15,
+    fontWeight: '700',
   },
-  botTime: {
-    color: '#9CA3AF',
+  paidAmount: {
+    color: '#16a34a',
   },
-  typingContainer: {
+  pendingAmount: {
+    color: '#d97706',
+  },
+  expertContainer: {
+    marginBottom: 15,
+    padding: 12,
+    backgroundColor: '#eff6ff',
+    borderRadius: 8,
+  },
+  expertTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#374151',
+    marginBottom: 5,
+  },
+  expertName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1e3a8a',
+    marginBottom: 8,
+  },
+  expertContact: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  typingDot: {
-    width: 8,
-    height: 8,
-    backgroundColor: '#9CA3AF',
-    borderRadius: 4,
-    marginHorizontal: 2,
-  },
-  quickQuestionsContainer: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  quickQuestionButton: {
-    backgroundColor: '#EBF8FF',
-    borderRadius: 20,
+  contactButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
     paddingHorizontal: 12,
     paddingVertical: 6,
-    marginRight: 8,
+    borderRadius: 15,
   },
-  quickQuestionText: {
-    color: '#2563EB',
-    fontSize: 12,
+  contactText: {
+    fontSize: 13,
+    color: '#3b82f6',
+    marginLeft: 5,
+    fontWeight: '500',
   },
-  inputContainer: {
+  nextStepContainer: {
+    marginBottom: 15,
+    padding: 12,
+    backgroundColor: '#fef3c7',
+    borderRadius: 8,
+  },
+  nextStepTitle: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#92400e',
+    marginBottom: 5,
+  },
+  nextStepText: {
+    fontSize: 13,
+    color: '#78716c',
+    lineHeight: 18,
+  },
+  treatmentDuration: {
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  treatmentText: {
+    fontSize: 13,
+    color: '#16a34a',
+    fontWeight: '500',
+  },
+  sinistreActions: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    justifyContent: 'space-around',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
+    borderTopColor: '#f3f4f6',
   },
-  inputWrapper: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-    borderRadius: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+  actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  textInput: {
-    flex: 1,
+  actionText: {
     fontSize: 14,
-    color: '#1F2937',
-    maxHeight: 100,
+    color: '#374151',
+    marginLeft: 5,
+    fontWeight: '500',
   },
-  micButton: {
+  urgenceCard: {
+    backgroundColor: '#fef2f2',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#fecaca',
+  },
+  urgenceHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  urgenceTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#dc2626',
     marginLeft: 8,
   },
-  sendButton: {
-    width: 40,
-    height: 40,
-    backgroundColor: '#3B82F6',
-    borderRadius: 20,
+  urgenceText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#991b1b',
+    marginBottom: 5,
+  },
+  urgenceSubtext: {
+    fontSize: 14,
+    color: '#7f1d1d',
+  },
+  preventionCard: {
+    backgroundColor: '#f0fdf4',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#bbf7d0',
+  },
+  preventionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  preventionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#166534',
+    marginLeft: 8,
+  },
+  preventionText: {
+    fontSize: 14,
+    color: '#15803d',
+    marginBottom: 10,
+  },
+  preventionList: {
+    marginLeft: 10,
+  },
+  preventionItem: {
+    fontSize: 13,
+    color: '#166534',
+    marginBottom: 5,
+    lineHeight: 18,
+  },
+  quickActionCard: {
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  quickActionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  quickActionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1e3a8a',
+    marginLeft: 8,
+  },
+  quickActionText: {
+    fontSize: 14,
+    color: '#6b7280',
+    lineHeight: 20,
+    marginBottom: 15,
+  },
+  quickActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1e3a8a',
+    paddingVertical: 15,
+    borderRadius: 12,
+  },
+  quickActionButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#ffffff',
+    marginRight: 8,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 30,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#ef4444',
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
   },
 });
 
-export default OremiApp;
+export default OremiSinistresScreen;
